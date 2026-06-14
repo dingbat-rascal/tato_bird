@@ -1,7 +1,8 @@
 local M = {}
 
 -- Path to the SQLite database
-local DB_PATH = vim.fn.stdpath('config') .. '/tatoeba.db'
+local DB_PATH = vim.fn.stdpath('data') .. '/tatoeba.db'
+-- local DB_PATH = vim.fn.stdpath('config') .. '/tatoeba.db'
 
 -- Check if database exists
 function M.db_exists()
