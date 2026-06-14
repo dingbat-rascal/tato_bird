@@ -101,56 +101,6 @@ function M.get_languages()
     return M.query(sql)
 end
 
--- Get all unique tags
-function M.get_tags()
-    local sql = [[
-        SELECT DISTINCT tag_name, COUNT(*) as count 
-        FROM tags 
-        GROUP BY tag_name 
-        ORDER BY count DESC
-    ]]
-    return M.query(sql)
-end
-
--- Get sentence pairs for a language pair
-function M.get_sentence_pairs(source_lang, target_lang, limit)
-    limit = limit or 100
-    
-    local sql = string.format([[
-        SELECT 
-            s1.id as source_id,
-            s1.text as source_text,
-            s1.lang as source_lang,
-            s2.id as target_id,
-            s2.text as target_text,
-            s2.lang as target_lang
-        FROM sentences s1
-        INNER JOIN links l ON s1.id = l.sentence_id
-        INNER JOIN sentences s2 ON l.translation_id = s2.id
-        WHERE s1.lang = '%s' AND s2.lang = '%s'
-        LIMIT %d
-    ]], source_lang, target_lang, limit)
-    
-    return M.query(sql)
-end
-
--- Get sentences by tag
-function M.get_sentences_by_tag(lang, tag_name, limit)
-    limit = limit or 100
-    
-    local sql = string.format([[
-        SELECT DISTINCT
-            s.id,
-            s.text,
-            s.lang
-        FROM sentences s
-        INNER JOIN tags t ON s.id = t.sentence_id
-        WHERE s.lang = '%s' AND t.tag_name = '%s'
-        LIMIT %d
-    ]], lang, tag_name, limit)
-    
-    return M.query(sql)
-end
 
 -- Get random sentence pairs with optional tag filter
 function M.get_random_pairs(source_lang, target_lang, tag_filter, limit)
@@ -230,43 +180,5 @@ function M.get_language_pairs(target_lang)
     return M.query(sql)
 end
 
--- Check if a language pair exists
-function M.has_language_pair(source_lang, target_lang)
-    local sql = string.format([[
-        SELECT COUNT(*) as count
-        FROM sentences s1
-        INNER JOIN links l ON s1.id = l.sentence_id
-        INNER JOIN sentences s2 ON l.translation_id = s2.id
-        WHERE s1.lang = '%s' AND s2.lang = '%s'
-        LIMIT 1
-    ]], source_lang, target_lang)
-    
-    local result = M.query(sql)
-    return result and result[1] and result[1].count > 0
-end
-
-
--- Get database statistics
-function M.get_stats()
-    local stats = {}
-    
-    -- Total sentences
-    local result = M.query("SELECT COUNT(*) as count FROM sentences")
-    stats.total_sentences = result and result[1] and result[1].count or 0
-    
-    -- Total languages
-    result = M.query("SELECT COUNT(DISTINCT lang) as count FROM sentences")
-    stats.total_languages = result and result[1] and result[1].count or 0
-    
-    -- Total links
-    result = M.query("SELECT COUNT(*) as count FROM links")
-    stats.total_links = result and result[1] and result[1].count or 0
-    
-    -- Total tags
-    result = M.query("SELECT COUNT(*) as count FROM tags")
-    stats.total_tags = result and result[1] and result[1].count or 0
-    
-    return stats
-end
 
 return M
