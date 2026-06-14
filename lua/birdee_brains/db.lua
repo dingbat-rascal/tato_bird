@@ -1,7 +1,19 @@
 local M = {}
 
 -- Path to the SQLite database
-local plugin_root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h:h")
+-- Find the plugin root by searching for the tato_bird plugin in runtimepath
+local function find_plugin_root()
+    local rtp = vim.api.nvim_list_runtime_paths()
+    for _, path in ipairs(rtp) do
+        if path:match("tato_bird$") or path:match("tato_bird[\\/]") then
+            return path
+        end
+    end
+    -- Fallback to calculating from current file location
+    return vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h:h:h")
+end
+
+local plugin_root = find_plugin_root()
 local DB_PATH = plugin_root .. '/tatoeba.db'
 
 -- Check if database exists
