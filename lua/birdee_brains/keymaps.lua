@@ -34,6 +34,13 @@ function M.setup_keymaps(buf, win, engine, dict_a, dict_b, settings, on_next_rou
     if not validate_buffer(buf) then
         return
     end
+    
+    -- Guard clause: validate keybinds exist
+    if not settings or not settings.keybinds then
+        vim.notify("Invalid keybinds configuration", vim.log.levels.ERROR)
+        return
+    end
+    
     local kb = settings.keybinds
 
     -- Restore prompt if edited (speedrun mode only)
@@ -120,6 +127,12 @@ function M.setup_speedrun_input(buf, engine, dict_a, dict_b, settings, ns_id, on
     if not validate_buffer(buf) then
         return
     end
+    
+    if not settings or not settings.keybinds then
+        vim.notify("Invalid keybinds configuration", vim.log.levels.ERROR)
+        return
+    end
+    
     local kb = settings.keybinds
 
     vim.keymap.set('i', kb.submit, function()
@@ -183,6 +196,12 @@ function M.setup_multiple_choice_input(buf, engine, dict_b, settings, ns_id, on_
     if not validate_buffer(buf) then
         return
     end
+    
+    if not settings or not settings.keybinds then
+        vim.notify("Invalid keybinds configuration", vim.log.levels.ERROR)
+        return
+    end
+    
     local kb = settings.keybinds
     local keys = kb.choice_keys
     
