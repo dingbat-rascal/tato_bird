@@ -14,7 +14,8 @@ local function find_plugin_root()
 end
 
 local plugin_root = find_plugin_root()
-local DB_PATH = plugin_root .. '/tatoeba.db'
+-- Use vim.fs.normalize to handle path separators cross-platform
+local DB_PATH = vim.fs.normalize(plugin_root .. '/tatoeba.db')
 
 -- Check if database exists
 function M.db_exists()
@@ -29,7 +30,7 @@ end
 -- Execute a SQL query and return results
 function M.query(sql, params)
     if not M.db_exists() then
-        vim.notify("Database not found at: " .. DB_PATH, vim.log.levels.ERROR)
+        vim.notify("Database not found at: " .. DB_PATH .. "\nPlugin root: " .. plugin_root, vim.log.levels.ERROR)
         return nil
     end
     
@@ -44,7 +45,9 @@ function M.query(sql, params)
         return results
     else
         -- Fall back to system sqlite3 command
-        local cmd = string.format('sqlite3 -json "%s" "%s"', DB_PATH, sql)
+        -- Escape the path properly for the shell
+        local escaped_path = DB_PATH:gsub('\\', '\\\\')
+        local cmd = string.format('sqlite3 -json "%s" "%s"', escaped_path, sql)
         local handle = io.popen(cmd)
         if not handle then
             vim.notify("Failed to execute sqlite3 command", vim.log.levels.ERROR)
@@ -244,3 +247,4 @@ function M.get_stats()
 end
 
 return M
+
