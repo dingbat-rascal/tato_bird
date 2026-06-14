@@ -27,6 +27,15 @@ function M.db_exists()
     return false
 end
 
+-- Escape SQL for shell command (collapse whitespace, escape quotes)
+local function escape_sql_for_shell(sql)
+    -- Collapse whitespace (multiple spaces, tabs, newlines become single space)
+    local collapsed = sql:gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+    -- Escape double quotes
+    collapsed = collapsed:gsub('"', '\\"')
+    return collapsed
+end
+
 -- Execute a SQL query and return results
 function M.query(sql, params)
     if not M.db_exists() then
@@ -45,8 +54,7 @@ function M.query(sql, params)
         return results
     else
         -- Fall back to system sqlite3 command
-        -- Escape quotes in the SQL for shell safety
-        local escaped_sql = sql:gsub('"', '\\"')
+        local escaped_sql = escape_sql_for_shell(sql)
         
         local cmd
         if vim.fn.has('win32') == 1 then
@@ -59,19 +67,24 @@ function M.query(sql, params)
         
         local handle = io.popen(cmd)
         if not handle then
-            vim.notify("Failed to execute sqlite3 command", vim.log.levels.ERROR)
+            vim.notify("Failed to execute sqlite3 command:\n" .. cmd, vim.log.levels.ERROR)
             return nil
         end
         
         local result = handle:read("*a")
         handle:close()
         
+        if not result or result == "" then
+            vim.notify("No results from database query", vim.log.levels.WARN)
+            return nil
+        end
+        
         -- Parse JSON result
         local ok_json, parsed = pcall(vim.fn.json_decode, result)
         if ok_json then
             return parsed
         else
-            vim.notify("Failed to parse database results", vim.log.levels.ERROR)
+            vim.notify("Failed to parse database results:\n" .. (result:sub(1, 200) or "empty"), vim.log.levels.ERROR)
             return nil
         end
     end
