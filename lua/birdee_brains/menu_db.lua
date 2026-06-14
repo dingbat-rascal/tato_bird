@@ -11,7 +11,6 @@ local state = {
     available_languages = nil,
     available_pairs = nil,
     available_topics = nil,
-    available_skills = nil,
 }
 
 -- Language code to name mapping (ISO 639-2/639-3 based on Library of Congress)
@@ -338,7 +337,6 @@ function M.reset()
         available_languages = nil,
         available_pairs = nil,
         available_topics = nil,
-        available_skills = nil,
     }
 end
 
@@ -357,8 +355,6 @@ function M.get_navigation_path()
     if state.filter_type then
         if state.filter_type == 'topic' then
             table.insert(path, "Filter: Topic")
-        elseif state.filter_type == 'skill' then
-            table.insert(path, "Filter: Skill Level")
         end
     end
     
@@ -444,7 +440,6 @@ function M.get_current_options()
         return {
             "Choose Lesson Filter:",
             "  [topic] Filter by Topic/Tag",
-            "  [skill] Filter by Skill Level",
             "  [none] No Filter (Random sentences)",
         }
         
@@ -467,32 +462,6 @@ function M.get_current_options()
             else
                 table.insert(options, "  No topics available for this language")
             end
-            return options
-            
-        elseif state.filter_type == 'skill' then
-            -- Select skill level with sentence counts
-            if not state.available_skills then
-                state.available_skills = db.get_skill_level_counts(state.source_lang, state.target_lang)
-            end
-            
-            local options = { "Select Skill Level:" }
-            
-            -- Create a map of skill levels to counts
-            local skill_counts = {}
-            if state.available_skills then
-                for _, skill in ipairs(state.available_skills) do
-                    skill_counts[skill.skill_level] = skill.count
-                end
-            end
-            
-            -- Display skill levels with counts
-            table.insert(options, string.format("  [beginner] Beginner (Simple sentences) (%s sentences)",
-                skill_counts.beginner or 0))
-            table.insert(options, string.format("  [intermediate] Intermediate (Medium complexity) (%s sentences)",
-                skill_counts.intermediate or 0))
-            table.insert(options, string.format("  [advanced] Advanced (Complex sentences) (%s sentences)",
-                skill_counts.advanced or 0))
-            
             return options
         end
         
