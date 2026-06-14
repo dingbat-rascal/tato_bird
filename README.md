@@ -44,9 +44,9 @@ return {
 
 ### Quick Start
 
-1. Install the plugin and extact the tatoeba.db file from the tatoeba.tar.gz in:
-  - Linux / macOS: ~/.local/share/nvim/lazy/tato_bird/
-  - Windows: ~/AppData/Local/nvim-data/lazy/tato_bird/
+1. Install the plugin and extact the [tatoeba.tar.gz](https://github.com/dingbat-rascal/tato_bird/releases/) file from the tatoeba.tar.gz in:
+  - Linux / macOS: ~/.local/share/nvim/
+  - Windows: ~/AppData/Local/nvim-data/
 2. Press `<C-g>` to launch
 3. Select a lesson from the menu
 4. In **multiple choice** mode: Press `jkl;` to select answers
