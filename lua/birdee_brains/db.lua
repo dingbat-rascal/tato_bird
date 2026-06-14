@@ -245,6 +245,26 @@ function M.has_language_pair(source_lang, target_lang)
     return result and result[1] and result[1].count > 0
 end
 
+-- Get skill level counts for a language pair
+function M.get_skill_level_counts(source_lang, target_lang)
+    -- Escape single quotes in language codes to prevent SQL injection
+    source_lang = source_lang:gsub("'", "''")
+    target_lang = target_lang:gsub("'", "''")
+    
+    local sql = string.format([[
+        SELECT 
+            COALESCE(s1.skill_level, 'beginner') as skill_level,
+            COUNT(*) as count
+        FROM sentences s1
+        INNER JOIN links l ON s1.id = l.sentence_id
+        INNER JOIN sentences s2 ON l.translation_id = s2.id
+        WHERE s1.lang = '%s' AND s2.lang = '%s'
+        GROUP BY s1.skill_level
+    ]], source_lang, target_lang)
+    
+    return M.query(sql)
+end
+
 -- Get database statistics
 function M.get_stats()
     local stats = {}
