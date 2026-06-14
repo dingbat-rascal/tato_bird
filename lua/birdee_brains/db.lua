@@ -45,9 +45,18 @@ function M.query(sql, params)
         return results
     else
         -- Fall back to system sqlite3 command
-        -- Escape the path properly for the shell
-        local escaped_path = DB_PATH:gsub('\\', '\\\\')
-        local cmd = string.format('sqlite3 -json "%s" "%s"', escaped_path, sql)
+        -- Escape quotes in the SQL for shell safety
+        local escaped_sql = sql:gsub('"', '\\"')
+        
+        local cmd
+        if vim.fn.has('win32') == 1 then
+            -- Windows: database path first, then -json flag
+            cmd = string.format('sqlite3 "%s" -json "%s"', DB_PATH, escaped_sql)
+        else
+            -- Unix-like systems: -json flag first
+            cmd = string.format('sqlite3 -json "%s" "%s"', DB_PATH, escaped_sql)
+        end
+        
         local handle = io.popen(cmd)
         if not handle then
             vim.notify("Failed to execute sqlite3 command", vim.log.levels.ERROR)
@@ -247,4 +256,3 @@ function M.get_stats()
 end
 
 return M
-
