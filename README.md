@@ -17,7 +17,7 @@
 </p>
 
 # Attention
-Content Disclaimer & Limitation of Liability This application utilizes language learning data sourced from Tatoeba. Content is generated entirely by third-party users. We do not actively monitor, [...]
+Content Disclaimer & Limitation of LiabilityThis application utilizes language learning data sourced from Tatoeba, a community-driven, crowd-sourced database of sentences and translations.No Pre-Screening: Content is generated entirely by third-party users. We do not actively monitor, verify, or pre-screen these submissions. Accuracy and Appropriateness: We do not guarantee the accuracy, grammatical correctness, safety, or appropriateness of any sentence. You may encounter content that is inaccurate, offensive, or mature. Assumption of Risk: By using this app, you acknowledge that you expose yourself to user-generated data at your own risk. The app developers are not liable for any damages or offense caused by this content. Report Content: If you find a sentence that is highly inappropriate, offensive, or incorrect, please use our reporting tool to flag it for review.
 
 # A Tatoeba fork of Birdee Brains primarily for language learning
 
@@ -44,9 +44,10 @@ return {
 
 ### Quick Start
 
-1. Install the plugin and extact the [tatoeba.tar.gz](https://github.com/dingbat-rascal/tato_bird/releases/) file from the tatoeba.tar.gz in:
+1. Install the plugin then extact the [tatoeba.tar.gz](https://github.com/dingbat-rascal/tato_bird/releases/) inside :
   - Linux / macOS: ~/.local/share/nvim/
   - Windows: ~/AppData/Local/nvim-data/
+  now that you have the tatoeba.db
 2. Press `<C-g>` to launch
 3. Select a lesson from the menu
 4. In **multiple choice** mode: Press `jkl;` to select answers
