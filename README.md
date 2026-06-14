@@ -38,7 +38,9 @@ return {
     keys = {
         { "<C-g>", function () require("birdee_brains").show_menu() end, desc = "Start Birdee Brains" },
     },
+opts = {
     choice_keys = { "j", "k", "l", ";" },  -- multiple choice selection keys
+  }
 }
 ```
 
