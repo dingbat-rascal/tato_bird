@@ -451,12 +451,12 @@ function M.get_current_options()
                 state.available_topics = db.get_tags_for_language(state.source_lang, 1000)
             end
             
-            local options = { "Select Topic (type tag name exactly):" }
+            local options = { "Select Topic (press Enter on a line):" }
             if state.available_topics and #state.available_topics > 0 then
-                -- Show ALL topics
+                -- Show ALL topics with sentence counts
                 for i, tag in ipairs(state.available_topics) do
-                    table.insert(options, string.format("  [%s] (%s sentences)",
-                        tag.tag_name,
+                    table.insert(options, string.format("  [%s] %s sentences",
+                        tag.tag,
                         tag.count))
                 end
             else
