@@ -84,10 +84,9 @@ function M.show_menu()
         -- Extract code/value from line based on current step
         local input = nil
         
-        if state.step == 1 or state.step == 2 or state.step == 3 or state.step == 4 then
+        if state.step == 1 or state.step == 2 or state.step == 3 then
             -- Extract code from line like "  [eng] English (12345 sentences)"
-            -- or "  [none] All sentences (10000+ pairs)"
-            -- or "  [topic] Filter by Topic/Tag"
+            -- or "  [none] No Filter (Random sentences)"
             -- or "  [maths] 123 sentences"
             input = line_text:match("%[([^%]]+)%]")
         end
@@ -102,8 +101,6 @@ function M.show_menu()
         elseif state.step == 2 then
             menu.select_target_language(input)
         elseif state.step == 3 then
-            menu.select_filter_type(input)
-        elseif state.step == 4 then
             menu.select_filter_value(input)
         end
         
@@ -132,10 +129,6 @@ function M.show_menu()
                 state.available_topics = nil
             elseif state.step == 4 then
                 state.step = 3
-                state.filter_type = nil
-                state.available_topics = nil
-            elseif state.step == 5 then
-                state.step = 4
                 state.filter_value = nil
             end
             vim.schedule(function()

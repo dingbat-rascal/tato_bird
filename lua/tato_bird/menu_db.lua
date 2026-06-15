@@ -3,10 +3,9 @@ local db = require('tato_bird.db')
 
 -- Menu state
 local state = {
-    step = 1,  -- 1: select source language, 2: select target language, 3: select filter (topic/skill), 4: select specific topic/skill
+    step = 1,  -- 1: select source language, 2: select target language, 3: select tag (or none)
     source_lang = nil,
     target_lang = nil,
-    filter_type = nil,  -- 'topic' or 'skill' or 'none'
     filter_value = nil,
     available_languages = nil,
     available_pairs = nil,
@@ -332,7 +331,6 @@ function M.reset()
         step = 1,
         source_lang = nil,
         target_lang = nil,
-        filter_type = nil,
         filter_value = nil,
         available_languages = nil,
         available_pairs = nil,
@@ -352,14 +350,8 @@ function M.get_navigation_path()
         table.insert(path, "From: " .. get_lang_name(state.target_lang))
     end
     
-    if state.filter_type then
-        if state.filter_type == 'topic' then
-            table.insert(path, "Filter: Topic")
-        end
-    end
-    
-    if state.filter_value then
-        table.insert(path, state.filter_value)
+    if state.filter_value and state.filter_value ~= 'none' then
+        table.insert(path, "Tag: " .. state.filter_value)
     end
     
     return table.concat(path, " → ")
@@ -377,20 +369,10 @@ function M.select_target_language(lang_code)
     state.step = 3
 end
 
--- Select filter type
-function M.select_filter_type(filter_type)
-    state.filter_type = filter_type
-    if filter_type == 'none' then
-        state.step = 5  -- Ready to start
-    else
-        state.step = 4
-    end
-end
-
--- Select specific topic or skill level
+-- Select tag (or none for random)
 function M.select_filter_value(value)
     state.filter_value = value
-    state.step = 5  -- Ready to start
+    state.step = 4  -- Ready to start
 end
 
 -- Get current menu options based on state
@@ -436,36 +418,29 @@ function M.get_current_options()
         return options
         
     elseif state.step == 3 then
-        -- Select filter type
-        return {
-            "Choose Lesson Filter:",
-            "  [topic] Filter by Topic/Tag",
-            "  [none] No Filter (Random sentences)",
-        }
-        
-    elseif state.step == 4 then
-        if state.filter_type == 'topic' then
-            -- Select topic
-            if not state.available_topics then
-                -- Get topics for the specific language pair
-                state.available_topics = db.get_tags_for_language_pair(state.source_lang, state.target_lang, 1000)
-            end
-            
-            local options = { "Select Topic (press Enter on a line):" }
-            if state.available_topics and #state.available_topics > 0 then
-                -- Show ALL topics with sentence counts for this language pair
-                for i, tag in ipairs(state.available_topics) do
-                    table.insert(options, string.format("  [%s] %s sentences",
-                        tag.tag,
-                        tag.count))
-                end
-            else
-                table.insert(options, "  No topics available for this language pair")
-            end
-            return options
+        -- Select tag or none
+        if not state.available_topics then
+            -- Get topics for the specific language pair
+            state.available_topics = db.get_tags_for_language_pair(state.source_lang, state.target_lang, 1000)
         end
         
-    elseif state.step == 5 then
+        local options = { "Select Topic/Tag (or none for random sentences):" }
+        -- Add "none" option first
+        table.insert(options, "  [none] No Filter (Random sentences)")
+        
+        if state.available_topics and #state.available_topics > 0 then
+            -- Show ALL topics with sentence counts for this language pair
+            for i, tag in ipairs(state.available_topics) do
+                table.insert(options, string.format("  [%s] %s sentences",
+                    tag.tag,
+                    tag.count))
+            end
+        else
+            table.insert(options, "  No topics available for this language pair")
+        end
+        return options
+        
+    elseif state.step == 4 then
         -- Ready to start
         return {
             "Ready to Start!",
@@ -473,8 +448,7 @@ function M.get_current_options()
             "Configuration:",
             "  Learning: " .. get_lang_name(state.source_lang),
             "  From: " .. get_lang_name(state.target_lang),
-            "  Filter: " .. (state.filter_type or "none"),
-            "  Value: " .. (state.filter_value or "none"),
+            "  Tag: " .. (state.filter_value or "none"),
             "",
             "Press <CR> to start the lesson",
             "Press <Esc> to go back",
@@ -491,7 +465,7 @@ end
 
 -- Check if ready to start game
 function M.is_ready()
-    return state.step == 5
+    return state.step == 4
 end
 
 -- Display menu in buffer
@@ -525,7 +499,7 @@ function M.display_menu(buf)
     table.insert(lines, "───────────────────────────────────────────────────────────")
     
     -- Show instructions (different for ready screen)
-    if state.step == 5 then
+    if state.step == 4 then
         table.insert(lines, "Press <Esc> to go back | q to quit")
     else
         table.insert(lines, "<Esc> to go back | q to quit")
