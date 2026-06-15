@@ -169,7 +169,25 @@ function M.get_tags_for_language(lang, limit)
         LIMIT %d
     ]], lang, limit)
     
+    -- Debug: Show the SQL being executed
+    vim.notify(string.format("Executing SQL:\n%s", sql), vim.log.levels.INFO)
+    
     local results = M.query(sql)
+    
+    -- Debug: Show raw results
+    if results then
+        vim.notify(string.format("Raw query returned %d results", #results), vim.log.levels.INFO)
+        if #results > 0 then
+            local first = results[1]
+            local keys = {}
+            for k, v in pairs(first) do
+                table.insert(keys, string.format("%s=%s(%s)", k, tostring(v), type(v)))
+            end
+            vim.notify(string.format("First result: %s", table.concat(keys, ", ")), vim.log.levels.INFO)
+        end
+    else
+        vim.notify("Query returned nil", vim.log.levels.ERROR)
+    end
     
     -- Filter out any invalid results (like column headers)
     if results and #results > 0 then
@@ -180,6 +198,7 @@ function M.get_tags_for_language(lang, limit)
                 table.insert(filtered, row)
             end
         end
+        vim.notify(string.format("After filtering: %d valid results", #filtered), vim.log.levels.INFO)
         return filtered
     end
     
