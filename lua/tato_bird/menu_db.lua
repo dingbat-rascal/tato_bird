@@ -503,7 +503,7 @@ function M.display_menu(buf)
     
     -- Header
     table.insert(lines, "╔═══════════════════════════════════════════════════════════╗")
-    table.insert(lines, "║          Tato Bird - Language Learning Menu           ║")
+    table.insert(lines, "║          Tato Bird - Language Learning Menu               ║")
     table.insert(lines, "╚═══════════════════════════════════════════════════════════╝")
     table.insert(lines, "")
     
