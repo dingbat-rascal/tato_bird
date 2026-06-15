@@ -447,20 +447,20 @@ function M.get_current_options()
         if state.filter_type == 'topic' then
             -- Select topic
             if not state.available_topics then
-                -- Get ALL topics (no limit)
-                state.available_topics = db.get_tags_for_language(state.source_lang, 1000)
+                -- Get topics for the specific language pair
+                state.available_topics = db.get_tags_for_language_pair(state.source_lang, state.target_lang, 1000)
             end
             
             local options = { "Select Topic (press Enter on a line):" }
             if state.available_topics and #state.available_topics > 0 then
-                -- Show ALL topics with sentence counts
+                -- Show ALL topics with sentence counts for this language pair
                 for i, tag in ipairs(state.available_topics) do
                     table.insert(options, string.format("  [%s] %s sentences",
                         tag.tag,
                         tag.count))
                 end
             else
-                table.insert(options, "  No topics available for this language")
+                table.insert(options, "  No topics available for this language pair")
             end
             return options
         end

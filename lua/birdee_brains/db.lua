@@ -152,25 +152,28 @@ function M.get_random_pairs(source_lang, target_lang, tag_filter, limit)
     return M.query(sql)
 end
 
--- Get tags for sentences in a specific language that have translations
-function M.get_tags_for_language(lang, limit)
+-- Get tags for sentence pairs between two languages
+function M.get_tags_for_language_pair(source_lang, target_lang, limit)
     limit = limit or 1000  -- Default to showing many tags
     
-    -- Escape single quotes in language code to prevent SQL injection
-    lang = lang:gsub("'", "''")
+    -- Escape single quotes in language codes to prevent SQL injection
+    source_lang = source_lang:gsub("'", "''")
+    target_lang = target_lang:gsub("'", "''")
     
-    -- Query for tags on sentences that exist in the specified language
-    -- This ensures we only show tags for sentences that actually exist
+    -- Query for tags on sentences that have translations to the target language
+    -- This ensures we only show tags for sentence pairs that actually exist
     local sql = string.format([[
         SELECT t.tag_name as tag, COUNT(DISTINCT t.sentence_id) as count
         FROM tags t
-        INNER JOIN sentences s ON t.sentence_id = s.id
-        WHERE s.lang = '%s'
+        INNER JOIN sentences s1 ON t.sentence_id = s1.id
+        INNER JOIN links l ON s1.id = l.sentence_id
+        INNER JOIN sentences s2 ON l.translation_id = s2.id
+        WHERE s1.lang = '%s' AND s2.lang = '%s'
         GROUP BY t.tag_name
         HAVING count > 0
         ORDER BY count DESC
         LIMIT %d
-    ]], lang, limit)
+    ]], source_lang, target_lang, limit)
     
     local results = M.query(sql)
     
