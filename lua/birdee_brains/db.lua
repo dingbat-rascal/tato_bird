@@ -160,7 +160,7 @@ function M.get_tags_for_language(lang, limit)
     lang = lang:gsub("'", "''")
     
     local sql = string.format([[
-        SELECT DISTINCT t.tag, COUNT(*) as count
+        SELECT t.tag, COUNT(*) as count
         FROM tags t
         INNER JOIN sentences s ON t.sentence_id = s.id
         WHERE s.lang = '%s'
@@ -169,7 +169,21 @@ function M.get_tags_for_language(lang, limit)
         LIMIT %d
     ]], lang, limit)
     
-    return M.query(sql)
+    local results = M.query(sql)
+    
+    -- Filter out any invalid results (like column headers)
+    if results and #results > 0 then
+        local filtered = {}
+        for _, row in ipairs(results) do
+            -- Only include rows that have actual data (not column names)
+            if row.tag and row.count and type(row.count) == "number" then
+                table.insert(filtered, row)
+            end
+        end
+        return filtered
+    end
+    
+    return results
 end
 
 -- Get available language pairs (languages that have translations to target_lang)

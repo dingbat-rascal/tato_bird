@@ -449,31 +449,15 @@ function M.get_current_options()
             if not state.available_topics then
                 -- Get ALL topics (no limit)
                 state.available_topics = db.get_tags_for_language(state.source_lang, 1000)
-                
-                -- Debug: Check what was returned
-                if state.available_topics then
-                    vim.notify(string.format("Loaded %d topics for %s", #state.available_topics, state.source_lang), vim.log.levels.INFO)
-                else
-                    vim.notify("get_tags_for_language returned nil", vim.log.levels.ERROR)
-                end
             end
             
             local options = { "Select Topic (press Enter on a line):" }
             if state.available_topics and #state.available_topics > 0 then
                 -- Show ALL topics with sentence counts
                 for i, tag in ipairs(state.available_topics) do
-                    -- Debug: Check tag structure
-                    if i == 1 then
-                        local keys = {}
-                        for k, v in pairs(tag) do
-                            table.insert(keys, k)
-                        end
-                        vim.notify(string.format("First tag has keys: %s", table.concat(keys, ", ")), vim.log.levels.INFO)
-                    end
-                    
                     table.insert(options, string.format("  [%s] %s sentences",
-                        tag.tag or tag.tag_name or "unknown",
-                        tag.count or 0))
+                        tag.tag,
+                        tag.count))
                 end
             else
                 table.insert(options, "  No topics available for this language")
