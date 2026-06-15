@@ -371,8 +371,16 @@ end
 
 -- Select tag (or none for random)
 function M.select_filter_value(value)
+    if not value or value == "" then
+        vim.notify("Invalid tag selection", vim.log.levels.ERROR)
+        return
+    end
+    
     state.filter_value = value
     state.step = 4  -- Ready to start
+    
+    -- Debug output
+    vim.notify(string.format("Selected tag: '%s'", value), vim.log.levels.INFO)
 end
 
 -- Get current menu options based on state
@@ -422,6 +430,14 @@ function M.get_current_options()
         if not state.available_topics then
             -- Get topics for the specific language pair
             state.available_topics = db.get_tags_for_language_pair(state.source_lang, state.target_lang, 1000)
+            
+            -- Debug: show how many topics were loaded
+            if state.available_topics then
+                vim.notify(string.format("Loaded %d topics for %s → %s", 
+                    #state.available_topics,
+                    state.source_lang,
+                    state.target_lang), vim.log.levels.INFO)
+            end
         end
         
         local options = { "Select Topic/Tag (or none for random sentences):" }

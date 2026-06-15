@@ -173,6 +173,16 @@ function M.start_game_from_db(menu_state)
             menu_state.filter_value or "nil"), vim.log.levels.INFO)
     end
     
+    -- Additional debug: show what we're about to query
+    vim.notify(string.format("Fetching %d pairs: %s → %s%s", 
+        limit,
+        menu_state.source_lang,
+        menu_state.target_lang,
+        (menu_state.filter_value and menu_state.filter_value ~= 'none') 
+            and (" [tag: " .. menu_state.filter_value .. "]") 
+            or " [no filter]"), 
+        vim.log.levels.INFO)
+    
     -- Apply tag filter (or none if 'none' was selected)
     if menu_state.filter_value and menu_state.filter_value ~= 'none' then
         pairs = db.get_random_pairs(menu_state.source_lang, menu_state.target_lang, menu_state.filter_value, limit)
