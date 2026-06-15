@@ -17,19 +17,33 @@ local plugin_root = find_plugin_root()
 -- Use vim.fs.normalize to handle path separators cross-platform
 local DB_PATH = vim.fs.normalize(plugin_root .. '/tatoeba.db')
 
--- Cache sqlite.lua availability to avoid repeated require attempts
-local SQLITE_LUA_AVAILABLE = nil
-local SQLITE_DB = nil
+-- Cache backend availability to avoid repeated require attempts
+local BACKEND_TYPE = nil  -- 'sqlite', 'plenary', or 'shell'
+local BACKEND_MODULE = nil
 
-local function get_sqlite_backend()
-    if SQLITE_LUA_AVAILABLE == nil then
-        local ok, sqlite = pcall(require, 'sqlite')
-        SQLITE_LUA_AVAILABLE = ok
-        if ok then
-            SQLITE_DB = sqlite
+local function get_db_backend()
+    if BACKEND_TYPE == nil then
+        -- Try sqlite.lua first
+        local ok_sqlite, sqlite = pcall(require, 'sqlite')
+        if ok_sqlite then
+            BACKEND_TYPE = 'sqlite'
+            BACKEND_MODULE = sqlite
+            return BACKEND_TYPE, BACKEND_MODULE
         end
+        
+        -- Try plenary.sqlite
+        local ok_plenary, plenary_sqlite = pcall(require, 'plenary.sqlite')
+        if ok_plenary then
+            BACKEND_TYPE = 'plenary'
+            BACKEND_MODULE = plenary_sqlite
+            return BACKEND_TYPE, BACKEND_MODULE
+        end
+        
+        -- Fall back to shell command
+        BACKEND_TYPE = 'shell'
+        return BACKEND_TYPE, nil
     end
-    return SQLITE_LUA_AVAILABLE, SQLITE_DB
+    return BACKEND_TYPE, BACKEND_MODULE
 end
 
 -- Check if database exists
@@ -58,14 +72,18 @@ function M.query(sql, params)
         return nil
     end
     
-    -- Use cached sqlite.lua availability check
-    local has_sqlite_lua, sqlite = get_sqlite_backend()
+    local backend_type, backend_module = get_db_backend()
     
-    if has_sqlite_lua then
+    if backend_type == 'sqlite' then
         -- Using sqlite.lua plugin
-        local db = sqlite.open(DB_PATH)
+        local db = backend_module.open(DB_PATH)
         local results = db:eval(sql, params or {})
         db:close()
+        return results
+    elseif backend_type == 'plenary' then
+        -- Using plenary.sqlite
+        local db = backend_module.new(DB_PATH)
+        local results = db:execute(sql, params or {})
         return results
     else
         -- Fall back to system sqlite3 command
