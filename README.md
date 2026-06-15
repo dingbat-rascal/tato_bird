@@ -16,9 +16,6 @@
   </pre>
 </p>
 
-# Attention
-Content Disclaimer & Limitation of Liability This application utilizes language learning data sourced from Tatoeba, a community-driven, crowd-sourced database of sentences and translations.No Pre-Screening: Content is generated entirely by third-party users. We do not actively monitor, verify, or pre-screen these submissions. Accuracy and Appropriateness: We do not guarantee the accuracy, grammatical correctness, safety, or appropriateness of any sentence. You may encounter content that is inaccurate, offensive, or mature. Assumption of Risk: By using this app, you acknowledge that you expose yourself to user-generated data at your own risk. The app developers are not liable for any damages or offense caused by this content. Report Content: If you find a sentence that is highly inappropriate, offensive, or incorrect, please use our reporting tool to flag it for review.
-
 # Tatoeba
 A fork of [Birdee Brains](https://github.com/dingbat-rascal/birdee_brains) primarily for language learning
 
@@ -65,7 +62,7 @@ The original [Birdee Brains](https://github.com/dingbat-rascal/birdee_brains) wa
   - While community driven is good, its not always. Users can subbmit mature content, other users use online gambling sites for user names.
 
 # Attention
-Content Disclaimer & Limitation of Liability This application utilizes language learning data sourced from Tatoeba, a community-driven, crowd-sourced database of sentences and translations.No Pre-Screening: Content is generated entirely by third-party users. We do not actively monitor, verify, or pre-screen these submissions. Accuracy and Appropriateness: We do not guarantee the accuracy, grammatical correctness, safety, or appropriateness of any sentence. You may encounter content that is inaccurate, offensive, or mature. Assumption of Risk: By using this app, you acknowledge that you expose yourself to user-generated data at your own risk. The app developers are not liable for any damages or offense caused by this content. Report Content: If you find a sentence that is highly inappropriate, offensive, or incorrect, please use our reporting tool to flag it for review.
+Content Disclaimer & Limitation of Liability This application utilizes language learning data sourced from Tatoeba, a community-driven, crowd-sourced database of sentences and translations.No Pre-Screening: Content is generated entirely by third-party users. We do not actively monitor, verify, or pre-screen these submissions. Accuracy and Appropriateness: We do not guarantee the accuracy, grammatical correctness, safety, or appropriateness of any sentence. You may encounter content that is inaccurate, offensive, or mature. Assumption of Risk: By using this app, you acknowledge that you expose yourself to user-generated data at your own risk. The app developers are not liable for any damages or offense caused by this content.
 
 
 ## Roadmap
