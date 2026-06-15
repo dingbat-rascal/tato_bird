@@ -40,7 +40,8 @@ opts = {
     choice_keys = { "j", "k", "l", ";" },  -- multiple choice selection keys
   }
 }
-```<table>
+```
+<table>
   <tr>
     <td><img src=<img height="200" alt="start" src="https://github.com/user-attachments/assets/af7a4227-31a1-4597-af4e-8491b4c14881" />
  alt="Badge 1"></td>
