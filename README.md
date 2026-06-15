@@ -48,7 +48,7 @@ opts = {
 <img height="200" alt="tag" src="https://github.com/user-attachments/assets/6b5d45fa-3df9-4691-8f7e-561f75ac45fc" />
 <img height="200" alt="start" src="https://github.com/user-attachments/assets/1031d79c-ad91-4943-a182-99c9ebed7cd6" />
 <img height="200" alt="wrong" src="https://github.com/user-attachments/assets/7643ace2-2526-4e48-95db-9882bf373af3" />
-<img height="200" alt="right" src="https://github.com/user-attachments/assets/90d93797-a8de-4b87-8da2-bde4228285ff" /
+<img height="200" alt="right" src="https://github.com/user-attachments/assets/90d93797-a8de-4b87-8da2-bde4228285ff" />
 </div>
 
 ### Quick Start
