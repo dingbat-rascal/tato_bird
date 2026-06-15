@@ -509,6 +509,12 @@ function M.display_menu(buf)
     vim.api.nvim_set_option_value('modifiable', true, { buf = buf })
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.api.nvim_set_option_value('modifiable', false, { buf = buf })
+    
+    -- Position cursor at the first line after header
+    local wins = vim.fn.win_findbuf(buf)
+    if #wins > 0 then
+        vim.api.nvim_win_set_cursor(wins[1], {1, 0})
+    end
 end
 
 return M
