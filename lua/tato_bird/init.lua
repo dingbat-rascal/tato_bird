@@ -84,20 +84,11 @@ function M.show_menu()
         -- Extract code/value from line based on current step
         local input = nil
         
-        if state.step == 1 or state.step == 2 then
-            -- Extract language code from line like "  [eng] English (12345 sentences)"
+        if state.step == 1 or state.step == 2 or state.step == 3 then
+            -- Extract code from line like "  [eng] English (12345 sentences)"
+            -- or "  [none] All sentences (10000+ pairs)"
+            -- or "  [maths] 123 sentences"
             input = line_text:match("%[([^%]]+)%]")
-        elseif state.step == 3 then
-            -- Extract filter type from line like "  [topic] Filter by Topic/Tag"
-            input = line_text:match("%[([^%]]+)%]")
-        elseif state.step == 4 then
-            if state.filter_type == 'topic' then
-                -- Extract tag name from line like "  [maths] (123 sentences)"
-                input = line_text:match("%[([^%]]+)%]")
-            else
-                -- Extract skill level from line like "  [beginner] Beginner (Simple sentences)"
-                input = line_text:match("%[([^%]]+)%]")
-            end
         end
         
         if not input then
@@ -110,9 +101,7 @@ function M.show_menu()
         elseif state.step == 2 then
             menu.select_target_language(input)
         elseif state.step == 3 then
-            menu.select_filter_type(input)
-        elseif state.step == 4 then
-            menu.select_filter_value(input)
+            menu.select_tag(input)
         end
         
         -- Redisplay menu
@@ -137,13 +126,10 @@ function M.show_menu()
             elseif state.step == 3 then
                 state.step = 2
                 state.target_lang = nil
+                state.available_tags = nil
+                state.total_pairs = nil
             elseif state.step == 4 then
                 state.step = 3
-                state.filter_type = nil
-                state.available_topics = nil
-                state.available_skills = nil
-            elseif state.step == 5 then
-                state.step = state.filter_type == 'none' and 3 or 4
                 state.filter_value = nil
             end
             vim.schedule(function()
@@ -182,15 +168,14 @@ function M.start_game_from_db(menu_state)
     
     -- Debug output
     if M.SETTINGS.debug then
-        vim.notify(string.format("Query params: source=%s, target=%s, filter_type=%s, filter_value=%s", 
+        vim.notify(string.format("Query params: source=%s, target=%s, filter_value=%s", 
             menu_state.source_lang or "nil",
             menu_state.target_lang or "nil", 
-            menu_state.filter_type or "nil",
             menu_state.filter_value or "nil"), vim.log.levels.INFO)
     end
     
-    -- Apply tag filter for both 'topic' and 'skill' types (both use tags in the database)
-    if menu_state.filter_value then
+    -- Apply tag filter (or none if 'none' was selected)
+    if menu_state.filter_value and menu_state.filter_value ~= 'none' then
         pairs = db.get_random_pairs(menu_state.source_lang, menu_state.target_lang, menu_state.filter_value, limit)
     else
         pairs = db.get_random_pairs(menu_state.source_lang, menu_state.target_lang, nil, limit)
@@ -223,7 +208,7 @@ function M.start_game_from_db(menu_state)
     end
     
     local filter_info = ""
-    if menu_state.filter_value then
+    if menu_state.filter_value and menu_state.filter_value ~= 'none' then
         filter_info = string.format(" (tag: %s)", menu_state.filter_value)
     end
     
