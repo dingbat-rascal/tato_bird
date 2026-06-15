@@ -17,6 +17,21 @@ local plugin_root = find_plugin_root()
 -- Use vim.fs.normalize to handle path separators cross-platform
 local DB_PATH = vim.fs.normalize(plugin_root .. '/tatoeba.db')
 
+-- Cache sqlite.lua availability to avoid repeated require attempts
+local SQLITE_LUA_AVAILABLE = nil
+local SQLITE_DB = nil
+
+local function get_sqlite_backend()
+    if SQLITE_LUA_AVAILABLE == nil then
+        local ok, sqlite = pcall(require, 'sqlite')
+        SQLITE_LUA_AVAILABLE = ok
+        if ok then
+            SQLITE_DB = sqlite
+        end
+    end
+    return SQLITE_LUA_AVAILABLE, SQLITE_DB
+end
+
 -- Check if database exists
 function M.db_exists()
     local f = io.open(DB_PATH, "r")
@@ -43,10 +58,10 @@ function M.query(sql, params)
         return nil
     end
     
-    -- Use sqlite.lua if available, otherwise fall back to system sqlite3
-    local ok, sqlite = pcall(require, 'sqlite')
+    -- Use cached sqlite.lua availability check
+    local has_sqlite_lua, sqlite = get_sqlite_backend()
     
-    if ok then
+    if has_sqlite_lua then
         -- Using sqlite.lua plugin
         local db = sqlite.open(DB_PATH)
         local results = db:eval(sql, params or {})
@@ -58,8 +73,18 @@ function M.query(sql, params)
         
         local cmd
         if vim.fn.has('win32') == 1 then
-            -- Windows: database path first, then -json flag
-            cmd = string.format('sqlite3 "%s" -json "%s"', DB_PATH, escaped_sql)
+            -- Windows: Use cmd.exe to avoid shell escaping issues
+            -- Write SQL to temp file to avoid command line length limits
+            local temp_sql = vim.fn.tempname() .. '.sql'
+            local f = io.open(temp_sql, 'w')
+            if f then
+                f:write(sql)
+                f:close()
+                cmd = string.format('sqlite3 -json "%s" < "%s"', DB_PATH, temp_sql)
+            else
+                -- Fallback to inline command if temp file fails
+                cmd = string.format('sqlite3 "%s" -json "%s"', DB_PATH, escaped_sql)
+            end
         else
             -- Unix-like systems: -json flag first
             cmd = string.format('sqlite3 -json "%s" "%s"', DB_PATH, escaped_sql)
