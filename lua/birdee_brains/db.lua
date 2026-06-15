@@ -152,19 +152,22 @@ function M.get_random_pairs(source_lang, target_lang, tag_filter, limit)
     return M.query(sql)
 end
 
--- Get tags for a specific language
+-- Get tags for sentences in a specific language that have translations
 function M.get_tags_for_language(lang, limit)
     limit = limit or 1000  -- Default to showing many tags
     
     -- Escape single quotes in language code to prevent SQL injection
     lang = lang:gsub("'", "''")
     
+    -- Query for tags on sentences that exist in the specified language
+    -- This ensures we only show tags for sentences that actually exist
     local sql = string.format([[
-        SELECT t.tag, COUNT(*) as count
+        SELECT t.tag, COUNT(DISTINCT t.sentence_id) as count
         FROM tags t
         INNER JOIN sentences s ON t.sentence_id = s.id
         WHERE s.lang = '%s'
         GROUP BY t.tag
+        HAVING count > 0
         ORDER BY count DESC
         LIMIT %d
     ]], lang, limit)
@@ -186,7 +189,7 @@ function M.get_tags_for_language(lang, limit)
             vim.notify(string.format("First result: %s", table.concat(keys, ", ")), vim.log.levels.INFO)
         end
     else
-        vim.notify("Query returned nil", vim.log.levels.ERROR)
+        vim.notify("Query returned nil - no tags found for this language", vim.log.levels.WARN)
     end
     
     -- Filter out any invalid results (like column headers)
@@ -202,7 +205,7 @@ function M.get_tags_for_language(lang, limit)
         return filtered
     end
     
-    return results
+    return results or {}
 end
 
 -- Get available language pairs (languages that have translations to target_lang)
