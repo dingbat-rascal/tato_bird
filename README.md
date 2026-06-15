@@ -19,7 +19,8 @@
 # Attention
 Content Disclaimer & Limitation of Liability This application utilizes language learning data sourced from Tatoeba, a community-driven, crowd-sourced database of sentences and translations.No Pre-Screening: Content is generated entirely by third-party users. We do not actively monitor, verify, or pre-screen these submissions. Accuracy and Appropriateness: We do not guarantee the accuracy, grammatical correctness, safety, or appropriateness of any sentence. You may encounter content that is inaccurate, offensive, or mature. Assumption of Risk: By using this app, you acknowledge that you expose yourself to user-generated data at your own risk. The app developers are not liable for any damages or offense caused by this content. Report Content: If you find a sentence that is highly inappropriate, offensive, or incorrect, please use our reporting tool to flag it for review.
 
-# A Tatoeba fork of [Birdee Brains] primarily for language learning
+# Tatoeba
+A fork of [Birdee Brains](https://github.com/dingbat-rascal/birdee_brains) primarily for language learning
 
 A quick, fun, interactive way to practice multiple choice directly inside your
 editor with vim motions. Features reinforcement learning for mistakes.
@@ -47,21 +48,27 @@ opts = {
 ### Quick Start
 
 1. Install the plugin then extact the [tatoeba.tar.gz](https://github.com/dingbat-rascal/tato_bird/releases/) inside this repos dir:
-  - Linux / macOS: ~/.local/share/nvim/lazy/tato_bird/
-  - Windows: ~/AppData/Local/nvim-data/lazy/tato_bird/
-  now that you have the tatoeba.db
-2. Press `<C-g>` to launch
+  - Linux / macOS: ~/.local/share/nvim/${package_manager}/tato_bird/
+  - Windows: ~/AppData/Local/nvim-data/%PACKAGE_MANAGER%/tato_bird/
+2. now that tatoeba.db is in place, launch nvim and Press `<C-g>` to reveal ui
 3. Select a lesson from the menu
 4. In **multiple choice** mode: Press `jkl;` to select answers
 
 ## History
 
-The original [Birdee Brains] was useful for personalized learning. This Tatoeba fork leverages the extensive [Tatoeba community database](https://tatoeba.org) of multilingual sentences.
+The original [Birdee Brains](https://github.com/dingbat-rascal/birdee_brains) was useful for personalized learning. This Tatoeba fork leverages the extensive [Tatoeba community database](https://tatoeba.org) of multilingual sentences.
 
 **Fun Fact:** [Tatoeba](https://en.wikipedia.org/wiki/Tatoeba) contributors are known as "Tatoebans"
 
-## Roadmap
+## Issues
+  - The new [tatoeba.db](https://github.com/dingbat-rascal/tato_bird/releases/) is faster then the previous, but still large. Some queries only return 1 sentence.
+  - While community driven is good, its not always. Users can subbmit mature content, other users use online gambling sites for user names.
 
+# Attention
+Content Disclaimer & Limitation of Liability This application utilizes language learning data sourced from Tatoeba, a community-driven, crowd-sourced database of sentences and translations.No Pre-Screening: Content is generated entirely by third-party users. We do not actively monitor, verify, or pre-screen these submissions. Accuracy and Appropriateness: We do not guarantee the accuracy, grammatical correctness, safety, or appropriateness of any sentence. You may encounter content that is inaccurate, offensive, or mature. Assumption of Risk: By using this app, you acknowledge that you expose yourself to user-generated data at your own risk. The app developers are not liable for any damages or offense caused by this content. Report Content: If you find a sentence that is highly inappropriate, offensive, or incorrect, please use our reporting tool to flag it for review.
+
+
+## Roadmap
     - [ ] **Analytics Suit:** A grading/progression system to display highscores and charts of your
       record allowing you to easily identify your strengths, and weak points.
     - [ ] **Streak System:** Reminder to check in. Display steak to insitivise
