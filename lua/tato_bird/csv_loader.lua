@@ -9,35 +9,36 @@ local M = {}
 --- @return table fields Array of field values
 local function parse_csv_line(line)
     local fields = {}
-    local field = ""
+    local field_chars = {}
     local in_quotes = false
     local i = 1
+    local len = #line
 
-    while i <= #line do
+    while i <= len do
         local char = line:sub(i, i)
 
         if char == '"' then
-            if in_quotes and i < #line and line:sub(i + 1, i + 1) == '"' then
+            if in_quotes and i < len and line:sub(i + 1, i + 1) == '"' then
                 -- Escaped quote
-                field = field .. '"'
+                table.insert(field_chars, '"')
                 i = i + 1
             else
                 -- Toggle quote state
                 in_quotes = not in_quotes
             end
         elseif char == ',' and not in_quotes then
-            -- End of field
-            table.insert(fields, field)
-            field = ""
+            -- End of field - use table.concat for efficiency
+            table.insert(fields, table.concat(field_chars))
+            field_chars = {}
         else
-            field = field .. char
+            table.insert(field_chars, char)
         end
 
         i = i + 1
     end
 
     -- Add the last field
-    table.insert(fields, field)
+    table.insert(fields, table.concat(field_chars))
 
     return fields
 end
@@ -59,16 +60,24 @@ function M.load_csv(filepath)
     -- Normalize path for the current platform
     local normalized_path = vim.fs.normalize(filepath)
     
-    local file = io.open(normalized_path, "r")
+    local file = io.open(normalized_path, "rb")  -- Use binary mode for consistent line endings
     if not file then
         return {}, {}, "Could not open CSV file: " .. normalized_path
     end
 
+    -- Read entire file at once (more efficient on Windows)
+    local content = file:read("*a")
+    file:close()
+    
+    if not content or content == "" then
+        return {}, {}, "CSV file is empty: " .. filepath
+    end
+
+    -- Split into lines (handle both \r\n and \n)
     local lines = {}
-    for line in file:lines() do
+    for line in content:gmatch("[^\r\n]+") do
         table.insert(lines, line)
     end
-    file:close()
 
     if #lines == 0 then
         return {}, {}, "CSV file is empty: " .. filepath
