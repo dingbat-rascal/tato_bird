@@ -127,7 +127,7 @@ function M.get_random_pairs(source_lang, target_lang, tag_filter, limit)
             INNER JOIN links l ON s1.id = l.sentence_id
             INNER JOIN sentences s2 ON l.translation_id = s2.id
             INNER JOIN tags t ON s1.id = t.sentence_id
-            WHERE s1.lang = '%s' AND s2.lang = '%s' AND t.tag = '%s'
+            WHERE s1.lang = '%s' AND s2.lang = '%s' AND t.tag_name = '%s'
             ORDER BY RANDOM()
             LIMIT %d
         ]], source_lang, target_lang, tag_filter, limit)
@@ -162,35 +162,17 @@ function M.get_tags_for_language(lang, limit)
     -- Query for tags on sentences that exist in the specified language
     -- This ensures we only show tags for sentences that actually exist
     local sql = string.format([[
-        SELECT t.tag, COUNT(DISTINCT t.sentence_id) as count
+        SELECT t.tag_name as tag, COUNT(DISTINCT t.sentence_id) as count
         FROM tags t
         INNER JOIN sentences s ON t.sentence_id = s.id
         WHERE s.lang = '%s'
-        GROUP BY t.tag
+        GROUP BY t.tag_name
         HAVING count > 0
         ORDER BY count DESC
         LIMIT %d
     ]], lang, limit)
     
-    -- Debug: Show the SQL being executed
-    vim.notify(string.format("Executing SQL:\n%s", sql), vim.log.levels.INFO)
-    
     local results = M.query(sql)
-    
-    -- Debug: Show raw results
-    if results then
-        vim.notify(string.format("Raw query returned %d results", #results), vim.log.levels.INFO)
-        if #results > 0 then
-            local first = results[1]
-            local keys = {}
-            for k, v in pairs(first) do
-                table.insert(keys, string.format("%s=%s(%s)", k, tostring(v), type(v)))
-            end
-            vim.notify(string.format("First result: %s", table.concat(keys, ", ")), vim.log.levels.INFO)
-        end
-    else
-        vim.notify("Query returned nil - no tags found for this language", vim.log.levels.WARN)
-    end
     
     -- Filter out any invalid results (like column headers)
     if results and #results > 0 then
@@ -201,7 +183,6 @@ function M.get_tags_for_language(lang, limit)
                 table.insert(filtered, row)
             end
         end
-        vim.notify(string.format("After filtering: %d valid results", #filtered), vim.log.levels.INFO)
         return filtered
     end
     
