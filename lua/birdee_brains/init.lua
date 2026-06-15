@@ -189,21 +189,17 @@ function M.start_game_from_db(menu_state)
             menu_state.filter_value or "nil"), vim.log.levels.INFO)
     end
     
-    -- Only apply tag filter if filter_type is 'topic'
-    -- Skill filters (beginner, female_speaker, etc.) are not yet implemented in the database
-    if menu_state.filter_type == 'topic' and menu_state.filter_value then
+    -- Apply tag filter for both 'topic' and 'skill' types (both use tags in the database)
+    if menu_state.filter_value then
         pairs = db.get_random_pairs(menu_state.source_lang, menu_state.target_lang, menu_state.filter_value, limit)
     else
-        -- For 'skill' or 'none' filter types, fetch without tag filter
         pairs = db.get_random_pairs(menu_state.source_lang, menu_state.target_lang, nil, limit)
     end
     
     if not pairs or #pairs == 0 then
         local filter_info = ""
-        if menu_state.filter_type == 'topic' and menu_state.filter_value then
+        if menu_state.filter_value then
             filter_info = string.format(" with tag '%s'", menu_state.filter_value)
-        elseif menu_state.filter_type == 'skill' and menu_state.filter_value then
-            filter_info = string.format(" (skill filter '%s' not yet implemented, showing all)", menu_state.filter_value)
         end
         vim.notify(string.format("No sentence pairs found for %s → %s%s", 
             menu_state.target_lang, menu_state.source_lang, filter_info), vim.log.levels.ERROR)
@@ -227,10 +223,8 @@ function M.start_game_from_db(menu_state)
     end
     
     local filter_info = ""
-    if menu_state.filter_type == 'topic' and menu_state.filter_value then
+    if menu_state.filter_value then
         filter_info = string.format(" (tag: %s)", menu_state.filter_value)
-    elseif menu_state.filter_type == 'skill' and menu_state.filter_value then
-        filter_info = string.format(" (skill filter '%s' ignored - not yet implemented)", menu_state.filter_value)
     end
     
     vim.notify(string.format("Loaded %d sentence pairs: %s → %s%s", 

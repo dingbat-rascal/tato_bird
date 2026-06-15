@@ -106,6 +106,13 @@ end
 function M.get_random_pairs(source_lang, target_lang, tag_filter, limit)
     limit = limit or 100
     
+    -- Escape single quotes in parameters to prevent SQL injection
+    source_lang = source_lang:gsub("'", "''")
+    target_lang = target_lang:gsub("'", "''")
+    if tag_filter then
+        tag_filter = tag_filter:gsub("'", "''")
+    end
+    
     local sql
     if tag_filter then
         sql = string.format([[
@@ -120,7 +127,7 @@ function M.get_random_pairs(source_lang, target_lang, tag_filter, limit)
             INNER JOIN links l ON s1.id = l.sentence_id
             INNER JOIN sentences s2 ON l.translation_id = s2.id
             INNER JOIN tags t ON s1.id = t.sentence_id
-            WHERE s1.lang = '%s' AND s2.lang = '%s' AND t.tag_name = '%s'
+            WHERE s1.lang = '%s' AND s2.lang = '%s' AND t.tag = '%s'
             ORDER BY RANDOM()
             LIMIT %d
         ]], source_lang, target_lang, tag_filter, limit)
@@ -153,11 +160,11 @@ function M.get_tags_for_language(lang, limit)
     lang = lang:gsub("'", "''")
     
     local sql = string.format([[
-        SELECT DISTINCT t.tag_name, COUNT(*) as count
+        SELECT DISTINCT t.tag, COUNT(*) as count
         FROM tags t
         INNER JOIN sentences s ON t.sentence_id = s.id
         WHERE s.lang = '%s'
-        GROUP BY t.tag_name
+        GROUP BY t.tag
         ORDER BY count DESC
         LIMIT %d
     ]], lang, limit)
