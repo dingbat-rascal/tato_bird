@@ -43,7 +43,7 @@ opts = {
 ```
 
 <div style="overflow-x: auto; display: flex; gap: 10px; padding-bottom: 10px;">
-<img height="200" alt="choice" src="https://github.com/user-attachments/assets/cd399204-0dd1-4db6-a3d9-7162954c09c0" /
+<img height="200" alt="choice" src="https://github.com/user-attachments/assets/cd399204-0dd1-4db6-a3d9-7162954c09c0" />
 <img height="200" alt="native" src="https://github.com/user-attachments/assets/f9ccd98f-41b2-431a-a11f-44d0c30e2698" />
 <img height="200" alt="tag" src="https://github.com/user-attachments/assets/6b5d45fa-3df9-4691-8f7e-561f75ac45fc" />
 <img height="200" alt="start" src="https://github.com/user-attachments/assets/1031d79c-ad91-4943-a182-99c9ebed7cd6" />
