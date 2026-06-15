@@ -5,7 +5,7 @@ local M = {}
 
 function M.load_dictionary()
     -- TODO: Implement Tatoeba data loading
-    -- This will load from the bundled Tatoeba CSV files in lua/birdee_brains/data/
+    -- This will load from the bundled Tatoeba CSV files in lua/tato_bird/data/
     error("Tatoeba data loading not yet implemented")
 end
 

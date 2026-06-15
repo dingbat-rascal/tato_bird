@@ -17,9 +17,9 @@
 </p>
 
 # Attention
-Content Disclaimer & Limitation of LiabilityThis application utilizes language learning data sourced from Tatoeba, a community-driven, crowd-sourced database of sentences and translations.No Pre-Screening: Content is generated entirely by third-party users. We do not actively monitor, verify, or pre-screen these submissions. Accuracy and Appropriateness: We do not guarantee the accuracy, grammatical correctness, safety, or appropriateness of any sentence. You may encounter content that is inaccurate, offensive, or mature. Assumption of Risk: By using this app, you acknowledge that you expose yourself to user-generated data at your own risk. The app developers are not liable for any damages or offense caused by this content. Report Content: If you find a sentence that is highly inappropriate, offensive, or incorrect, please use our reporting tool to flag it for review.
+Content Disclaimer & Limitation of Liability This application utilizes language learning data sourced from Tatoeba, a community-driven, crowd-sourced database of sentences and translations.No Pre-Screening: Content is generated entirely by third-party users. We do not actively monitor, verify, or pre-screen these submissions. Accuracy and Appropriateness: We do not guarantee the accuracy, grammatical correctness, safety, or appropriateness of any sentence. You may encounter content that is inaccurate, offensive, or mature. Assumption of Risk: By using this app, you acknowledge that you expose yourself to user-generated data at your own risk. The app developers are not liable for any damages or offense caused by this content. Report Content: If you find a sentence that is highly inappropriate, offensive, or incorrect, please use our reporting tool to flag it for review.
 
-# A Tatoeba fork of Birdee Brains primarily for language learning
+# A Tatoeba fork of [Birdee Brains] primarily for language learning
 
 A quick, fun, interactive way to practice multiple choice directly inside your
 editor with vim motions. Features reinforcement learning for mistakes.
@@ -36,7 +36,7 @@ Uses the [Tatoeba](https://tatoeba.org) sentence database to compile your desire
 return {
     "dingbat-rascal/tato_bird",
     keys = {
-        { "<C-g>", function () require("birdee_brains").show_menu() end, desc = "Start Birdee Brains" },
+        { "<C-g>", function () require("tato_bird").show_menu() end, desc = "Start Tato Bird" },
     },
 opts = {
     choice_keys = { "j", "k", "l", ";" },  -- multiple choice selection keys
@@ -46,9 +46,9 @@ opts = {
 
 ### Quick Start
 
-1. Install the plugin then extact the [tatoeba.tar.gz](https://github.com/dingbat-rascal/tato_bird/releases/) inside :
-  - Linux / macOS: ~/.local/share/nvim/
-  - Windows: ~/AppData/Local/nvim-data/
+1. Install the plugin then extact the [tatoeba.tar.gz](https://github.com/dingbat-rascal/tato_bird/releases/) inside this repos dir:
+  - Linux / macOS: ~/.local/share/nvim/lazy/tato_bird/
+  - Windows: ~/AppData/Local/nvim-data/lazy/tato_bird/
   now that you have the tatoeba.db
 2. Press `<C-g>` to launch
 3. Select a lesson from the menu
@@ -56,7 +56,7 @@ opts = {
 
 ## History
 
-The original birdee_brains was useful for personalized learning. This Tatoeba fork leverages the extensive [Tatoeba community database](https://tatoeba.org) of multilingual sentences.
+The original [Birdee Brains] was useful for personalized learning. This Tatoeba fork leverages the extensive [Tatoeba community database](https://tatoeba.org) of multilingual sentences.
 
 **Fun Fact:** [Tatoeba](https://en.wikipedia.org/wiki/Tatoeba) contributors are known as "Tatoebans"
 

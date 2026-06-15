@@ -4,11 +4,11 @@ local M = {}
 -- Requires
 -- ============================================================================
 
-local settings_module = require("birdee_brains.settings")
-local dictionary_module = require("birdee_brains.dictionary")
-local game_engine_module = require("birdee_brains.game_engine")
-local ui_module = require("birdee_brains.ui")
-local keymaps_module = require("birdee_brains.keymaps")
+local settings_module = require("tato_bird.settings")
+local dictionary_module = require("tato_bird.dictionary")
+local game_engine_module = require("tato_bird.game_engine")
+local ui_module = require("tato_bird.ui")
+local keymaps_module = require("tato_bird.keymaps")
 
 -- ============================================================================
 -- Local State
@@ -22,8 +22,8 @@ M.SETTINGS = {}
 
 --- Show the navigation menu
 function M.show_menu()
-    local menu = require('birdee_brains.menu_db')
-    local db = require('birdee_brains.db')
+    local menu = require('tato_bird.menu_db')
+    local db = require('tato_bird.db')
     
     -- Check if database exists
     if not db.db_exists() then
@@ -174,7 +174,7 @@ end
 
 --- Start game from database menu configuration
 function M.start_game_from_db(menu_state)
-    local db = require('birdee_brains.db')
+    local db = require('tato_bird.db')
     
     -- Fetch sentence pairs from database
     local limit = M.SETTINGS.lesson_size or 100
@@ -382,13 +382,13 @@ function M.setup(opts)
     M.SETTINGS = vim.tbl_deep_extend("force", settings_module.DEFAULTS, opts or {})
     
     -- Create user commands
-    vim.api.nvim_create_user_command('BirdeeBrainsMenu', function()
+    vim.api.nvim_create_user_command('TatoBirdMenu', function()
         M.show_menu()
-    end, { desc = "Open Birdee Brains menu" })
+    end, { desc = "Open Tato Bird menu" })
     
     
     -- Setup global keymap to launch menu
-    vim.keymap.set('n', '<C-g>', M.show_menu, { silent = true, desc = "Open Birdee Brains Menu" })
+    vim.keymap.set('n', '<C-g>', M.show_menu, { silent = true, desc = "Open Tato Bird Menu" })
 end
 
 return M

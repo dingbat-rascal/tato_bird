@@ -1,5 +1,5 @@
 local M = {}
-local db = require('birdee_brains.db')
+local db = require('tato_bird.db')
 
 -- Menu state
 local state = {
@@ -503,7 +503,7 @@ function M.display_menu(buf)
     
     -- Header
     table.insert(lines, "╔═══════════════════════════════════════════════════════════╗")
-    table.insert(lines, "║          Birdee Brains - Language Learning Menu           ║")
+    table.insert(lines, "║          Tato Bird - Language Learning Menu           ║")
     table.insert(lines, "╚═══════════════════════════════════════════════════════════╝")
     table.insert(lines, "")
     
