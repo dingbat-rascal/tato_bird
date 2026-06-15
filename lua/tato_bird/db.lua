@@ -5,16 +5,19 @@ local M = {}
 local function find_plugin_root()
     local rtp = vim.api.nvim_list_runtime_paths()
     for _, path in ipairs(rtp) do
-        if path:match("tato_bird$") or path:match("tato_bird[\\/]") then
-            return path
+        -- Normalize path for comparison
+        local normalized = vim.fs.normalize(path)
+        if normalized:match("tato_bird$") or normalized:match("tato_bird[\\/]") then
+            return normalized
         end
     end
     -- Fallback to calculating from current file location
-    return vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h:h:h")
+    local source_file = debug.getinfo(1, "S").source:sub(2)
+    return vim.fn.fnamemodify(source_file, ":h:h:h")
 end
 
 local plugin_root = find_plugin_root()
--- Use vim.fs.normalize to handle path separators cross-platform
+-- Use proper path joining for cross-platform compatibility
 local DB_PATH = vim.fs.normalize(plugin_root .. '/tatoeba.db')
 
 -- Cache backend availability to avoid repeated require attempts
@@ -60,8 +63,19 @@ end
 local function escape_sql_for_shell(sql)
     -- Collapse whitespace (multiple spaces, tabs, newlines become single space)
     local collapsed = sql:gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
-    -- Escape double quotes
-    collapsed = collapsed:gsub('"', '\\"')
+    
+    -- On Windows, handle both cmd.exe and PowerShell escaping
+    if vim.fn.has('win32') == 1 then
+        -- For Windows, escape double quotes by doubling them for cmd.exe
+        -- and also handle special characters
+        collapsed = collapsed:gsub('"', '""')
+        -- Escape special cmd.exe characters
+        collapsed = collapsed:gsub('([&|<>^])', '^%1')
+    else
+        -- Unix-like: escape double quotes with backslash
+        collapsed = collapsed:gsub('"', '\\"')
+    end
+    
     return collapsed
 end
 
@@ -87,35 +101,64 @@ function M.query(sql, params)
         return results
     else
         -- Fall back to system sqlite3 command
-        local escaped_sql = escape_sql_for_shell(sql)
-        
+        local temp_sql = nil
         local cmd
+        
         if vim.fn.has('win32') == 1 then
-            -- Windows: Use cmd.exe to avoid shell escaping issues
-            -- Write SQL to temp file to avoid command line length limits
-            local temp_sql = vim.fn.tempname() .. '.sql'
+            -- Windows: Always use temp file to avoid escaping issues
+            -- and command line length limits
+            temp_sql = vim.fn.tempname() .. '.sql'
             local f = io.open(temp_sql, 'w')
-            if f then
-                f:write(sql)
-                f:close()
-                cmd = string.format('sqlite3 -json "%s" < "%s"', DB_PATH, temp_sql)
-            else
-                -- Fallback to inline command if temp file fails
-                cmd = string.format('sqlite3 "%s" -json "%s"', DB_PATH, escaped_sql)
+            if not f then
+                vim.notify("Failed to create temp SQL file", vim.log.levels.ERROR)
+                return nil
             end
+            f:write(sql)
+            f:close()
+            
+            -- Normalize paths for Windows
+            local db_path_win = vim.fn.shellescape(DB_PATH)
+            local temp_sql_win = vim.fn.shellescape(temp_sql)
+            
+            -- Use cmd.exe with proper redirection
+            cmd = string.format('cmd.exe /c "sqlite3 -json %s < %s"', db_path_win, temp_sql_win)
         else
-            -- Unix-like systems: -json flag first
-            cmd = string.format('sqlite3 -json "%s" "%s"', DB_PATH, escaped_sql)
+            -- Unix-like systems: Use temp file for consistency and to avoid escaping issues
+            temp_sql = vim.fn.tempname() .. '.sql'
+            local f = io.open(temp_sql, 'w')
+            if not f then
+                vim.notify("Failed to create temp SQL file", vim.log.levels.ERROR)
+                return nil
+            end
+            f:write(sql)
+            f:close()
+            
+            -- Use shell redirection
+            cmd = string.format('sqlite3 -json %s < %s', vim.fn.shellescape(DB_PATH), vim.fn.shellescape(temp_sql))
         end
         
         local handle = io.popen(cmd)
         if not handle then
+            -- Clean up temp file
+            if temp_sql then
+                os.remove(temp_sql)
+            end
             vim.notify("Failed to execute sqlite3 command:\n" .. cmd, vim.log.levels.ERROR)
             return nil
         end
         
         local result = handle:read("*a")
-        handle:close()
+        local success = handle:close()
+        
+        -- Clean up temp file
+        if temp_sql then
+            os.remove(temp_sql)
+        end
+        
+        if not success then
+            vim.notify("sqlite3 command failed. Is sqlite3 installed and in PATH?", vim.log.levels.ERROR)
+            return nil
+        end
         
         if not result or result == "" then
             vim.notify("No results from database query", vim.log.levels.WARN)
